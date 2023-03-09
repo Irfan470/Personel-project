@@ -1,15 +1,35 @@
+import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
 import React, { useState } from "react";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 import OAuth from "../components/OAuth";
 
 export default function SignIn() {
+  async function onSubmit(e) {
+    e.preventDefault();
+    try {
+      const auth = getAuth();
+
+      const userCredentials = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredentials.user) {
+        navigate("/");
+      }
+    } catch (error) {
+      toast.error("wrong user details");
+    }
+  }
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
   const { email, password } = formData;
+  const navigate = useNavigate();
   function onChange(event) {
     setFormData((prevState) => ({
       ...prevState,
@@ -81,6 +101,7 @@ export default function SignIn() {
               </p>
             </div>
             <button
+              onClick={onSubmit}
               type="submit"
               className="justify-center w-full bg-blue-600 text-white px-7 py-3 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-700 transition duration-200 ease-in-out hover:shadow-lg active:bg-blue-800"
             >
