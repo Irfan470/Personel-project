@@ -2,7 +2,15 @@ import React, { useState } from "react";
 import { BsEyeSlash, BsEye } from "react-icons/bs";
 import { Link } from "react-router-dom";
 import OAuth from "../components/OAuth";
-
+import {
+  getAuth,
+  createUserWithEmailAndPassword,
+  updateProfile,
+} from "firebase/auth";
+import { db } from "../firebase";
+import { useNavigate } from "react-router-dom";
+import { serverTimestamp, setDoc, doc } from "firebase/firestore";
+import { toast } from "react-toastify";
 export default function SignIp() {
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
@@ -11,11 +19,35 @@ export default function SignIp() {
     password: "",
   });
   const { name, email, password } = formData;
+  const navigate = useNavigate();
   function onChange(event) {
     setFormData((prevState) => ({
       ...prevState,
       [event.target.id]: event.target.value,
     }));
+  }
+  async function onSubmit(event) {
+    event.preventDefault();
+    try {
+      const auth = getAuth();
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      updateProfile(auth.currentUser, {
+        displayName: name,
+      });
+      const user = userCredential.user;
+      const formDataCopy = { ...formData };
+      delete formDataCopy.password;
+      formDataCopy.timestamp = serverTimestamp();
+      await setDoc(doc(db, "users", user.uid), formDataCopy);
+      // toast.success("signup successful");
+      navigate("/");
+    } catch (error) {
+      toast.error("something wrong");
+    }
   }
   return (
     <section>
@@ -32,7 +64,7 @@ export default function SignIp() {
           className="w-full md:w-[67%] lg:w-[40%] lg:ml-20
           "
         >
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               className="w-full px-4 py-2 text-xl text-gray-700 bg-white rounded transition  ease-in-out mb-6"
               type="text"
