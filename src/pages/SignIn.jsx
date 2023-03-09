@@ -51,7 +51,7 @@ export default function SignIn() {
           className="w-full md:w-[67%] lg:w-[40%] lg:ml-20
           "
         >
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               className="w-full px-4 py-2 text-xl text-gray-700 bg-white rounded transition  ease-in-out mb-6"
               type="email"
@@ -101,7 +101,6 @@ export default function SignIn() {
               </p>
             </div>
             <button
-              onClick={onSubmit}
               type="submit"
               className="justify-center w-full bg-blue-600 text-white px-7 py-3 text-sm font-medium uppercase rounded shadow-md hover:bg-blue-700 transition duration-200 ease-in-out hover:shadow-lg active:bg-blue-800"
             >
